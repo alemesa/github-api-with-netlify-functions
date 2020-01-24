@@ -1,21 +1,42 @@
-import React from "react"
-import { Link } from "gatsby"
-
+import React, { useEffect, useState } from "react"
 import Layout from "../components/layout"
-import Image from "../components/image"
 import SEO from "../components/seo"
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link>
-  </Layout>
-)
+function IndexPage() {
+  const [repos, setRepos] = useState([])
+
+  useEffect(() => {
+    fetch(
+      "https://youthful-noether-6e4573.netlify.com/.netlify/functions/github"
+    )
+      .then(response => response.json())
+      .then(data => setRepos(data))
+  }, [])
+
+  return (
+    <Layout>
+      <SEO title="Home" />
+      <h1>Lambda Call example</h1>
+      <h2>Getting first 100 Jam3 repos</h2>
+
+      {Boolean(repos) && repos.length && (
+        <div
+          className="repos"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gridGap: "20px",
+          }}
+        >
+          {repos.map(repo => (
+            <a href={repo.html_url} target="_blank">
+              {repo.name}
+            </a>
+          ))}
+        </div>
+      )}
+    </Layout>
+  )
+}
 
 export default IndexPage
